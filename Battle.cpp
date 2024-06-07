@@ -21,12 +21,7 @@ void Battle::initializeCharacters() {
 std::vector<std::string> Battle::alliesInfo() {
     std::vector<std::string> status;
     for (const auto &character: GameInitialization::characters) {
-        std::string info = character->name + ": HP "
-                           + std::to_string(character->health)
-                           + "/" + std::to_string(character->maxHealth)
-                           + ", MP " + std::to_string(character->mana)
-                           + "/" + std::to_string(character->maxMana);
-        status.push_back(info);
+        status.push_back(character->showStatus());
     }
     return status;
 }
@@ -37,12 +32,8 @@ std::vector<std::string> Battle::alliesInfo() {
  */
 std::vector<std::string> Battle::enemiesInfo() {
     std::vector<std::string> status;
-
     for (const auto &character: GameInitialization::enemies) {
-        std::string info = character->name + ": HP "
-                           + std::to_string(character->health)
-                           + "/" + std::to_string(character->maxHealth);
-        status.push_back(info);
+        status.push_back(character->showStatus());
     }
     return status;
 }
@@ -53,25 +44,39 @@ std::vector<std::string> Battle::enemiesInfo() {
  */
 int Battle::checkBattleRes() {
     bool aStatus = false, eStatus = false;
-    for (int i = 0; i < enemies.size(); i++) {
-        if (enemies.at(i)->health > 0) {
+
+    for (auto &enemy: enemies) {
+        if (enemy->getAttribute("health") > 0) {
             eStatus = true;
             break;
         }
     }
 
     if (eStatus == false) {
-        logWin->printLog(logEntries, "玩家胜利!");
+
+        // 给与所有角色经验奖励
+        int experience = 0;
+        for (auto &enemy: enemies) {
+            experience += enemy->experience;
+        }
+        logWin->printLog(logEntries, "玩家胜利，共计获得经验值：" + std::to_string(experience));
+
+        for (auto &allie: allies) {
+            allie->gainExperience(experience);
+            allie->saveToFile();
+        }
+
         return -2;
     }
 
 
-    for (int i = 0; i < allies.size(); i++) {
-        if (allies.at(i)->health > 0) {
+    for (auto &allie: allies) {
+        if (allie->getAttribute("health") > 0) {
             aStatus = true;
             break;
         }
     }
+
     if (aStatus == false) {
         logWin->printLog(logEntries, "玩家战败!");
         return -1;
@@ -89,6 +94,9 @@ void Battle::runBattle() {
         enemiesWin->updateStatus(enemiesInfo());
         executeTurn();
     }
+
+    alliesWin->updateStatus(alliesInfo());
+    enemiesWin->updateStatus(enemiesInfo());
 }
 
 /**
@@ -98,7 +106,7 @@ void Battle::runBattle() {
 void Battle::executeEnemyAction(Character &actor) {
     std::vector<int> aliveTargets;
     for (int i = 0; i < allies.size(); ++i) {
-        if (allies[i]->health > 0) {
+        if (allies[i]->getAttribute("health") > 0) {
             aliveTargets.push_back(i);
         }
     }
@@ -111,7 +119,7 @@ void Battle::executeEnemyAction(Character &actor) {
 
         logWin->printLog(logEntries, actor.name + " 攻击 " + allies[targetIndex]->name);
         actor.attackTarget(*allies[targetIndex]);
-        if (allies[targetIndex]->health <= 0) {
+        if (allies[targetIndex]->getAttribute("health") <= 0) {
             logWin->printLog(logEntries, allies[targetIndex]->name + " 被击败!");
         }
     }
@@ -123,7 +131,7 @@ void Battle::executeEnemyAction(Character &actor) {
  */
 void Battle::executeTurn() {
     Character *actor = isAlliesTurn ? allies[currentTurn] : enemies[currentTurn];
-    if (actor->health > 0) {
+    if (actor->getAttribute("health") > 0) {
         logWin->printLog(logEntries, actor->name + "开始行动！");
         if (isAlliesTurn) {
             handleAction(*actor);
@@ -173,7 +181,7 @@ void Battle::displayMainMenu() {
 void Battle::printAttackTargets() {
     std::string msg = "选择你要攻击的对象: ";
     for (int i = 0; i < enemies.size(); i++) {
-        if (enemies[i]->health > 0) {
+        if (enemies[i]->getAttribute("health") > 0) {
             msg += std::to_string(i + 1) + "." + enemies[i]->name + " ";
         }
     }
@@ -213,14 +221,15 @@ void Battle::chooseTarget(Character &actor) {
     }
 
     try {
-        logWin->printLog(logEntries, actor.name + " 攻击 " + enemies.at(index)->name);
-        actor.attackTarget(*enemies.at(index));
-        if (enemies.at(index)->health <= 0) {
+        int damage = actor.attackTarget(*enemies.at(index));
+        logWin->printLog(logEntries, actor.name + " 对 " + enemies.at(index)->name +"造成伤害：" + std::to_string(damage));
+        if (enemies.at(index)->getAttribute("health") <= 0) {
             logWin->printLog(logEntries, enemies.at(index)->name + " 被击败!");
         }
         nextTurn();
     } catch (const std::out_of_range &e) {
         logWin->printLog(logEntries, "无效的输入！");
+        logWin->printLog(logEntries, e.what());
     }
 }
 
@@ -231,8 +240,9 @@ void Battle::chooseTarget(Character &actor) {
  */
 void Battle::chooseSkill(Character &actor) {
     std::string msg = "选择使用的技能: ";
-    for (int i = 0; i < actor.skills.size(); ++i) {
-        msg += std::to_string(i + 1) + "." + actor.skills.at(i)->name + " ";
+    int i = 1;
+    for (auto &skill: actor.skills) {
+        msg += std::to_string(i++) + "." + skill->name + " ";
     }
     msg += "0.返回";
     commandWin->displayCommand(msg);
@@ -245,8 +255,7 @@ void Battle::chooseSkill(Character &actor) {
     }
 
     if (skillIndex >= 0 && skillIndex < actor.skills.size()) {
-        Skill* skill = actor.skills[skillIndex];
-        selectTargetsAndExecuteSkill(actor, *skill);
+        selectTargetsAndExecuteSkill(actor, *actor.skills.at(skillIndex));
     } else {
         logWin->printLog(logEntries, "无效的输入！");
         commandWin->displayCommand(msg);
@@ -259,7 +268,7 @@ void Battle::chooseSkill(Character &actor) {
  * @param skill
  */
 void Battle::selectTargetsAndExecuteSkill(Character &actor, Skill &skill) {
-    std::vector<Character*> targets = skill.isAllyTarget() ? allies : enemies;
+    std::vector<Character *> targets = skill.isAllyTarget() ? allies : enemies;
 
     // 群体攻击
     if (skill.isAreaEffect()) {
@@ -287,8 +296,8 @@ void Battle::selectTargetsAndExecuteSkill(Character &actor, Skill &skill) {
  * @param targets
  * @param skill
  */
-void Battle::executeSkillChoice(Character &caster, std::vector<Character*> &targets, Skill &skill) {
-    if (caster.mana < skill.manaCost) {
+void Battle::executeSkillChoice(Character &caster, std::vector<Character *> &targets, Skill &skill) {
+    if (caster.getAttribute("mana") < skill.manaCost) {
         logWin->printLog(logEntries, caster.name + "没有足够的魔法施展" + skill.name);
         return;
     }
@@ -301,11 +310,11 @@ void Battle::executeSkillChoice(Character &caster, std::vector<Character*> &targ
         return;
     }
 
-    for (Character* target : targets) {
+    for (Character *target: targets) {
         skill.effect(caster, *target);
         std::string message = caster.name + "对" + target->name + "施展了" + skill.name;
         logWin->printLog(logEntries, message);
-        if (target->health <= 0) {
+        if (target->getAttribute("health") <= 0) {
             logWin->printLog(logEntries, target->name + "被击败!");
         }
     }
@@ -317,11 +326,13 @@ void Battle::executeSkillChoice(Character &caster, std::vector<Character*> &targ
  * @param skill
  * @param targets
  */
-void Battle::printTargetChoices(const Skill &skill, const std::vector<Character*> &targets) {
+void Battle::printTargetChoices(const Skill &skill, const std::vector<Character *> &targets) {
     std::string msg = "选择技能释放的对象: ";
-    for (int i = 0; i < targets.size(); ++i) {
-        if (skill.isForDead() && targets[i]->health == 0 || !skill.isForDead() && targets[i]->health > 0) {
-            msg += std::to_string(i + 1) + "." + targets[i]->name + " ";
+    int i = 1;
+    for (auto &targets: targets) {
+        if (skill.isForDead() && targets->getAttribute("health") == 0 ||
+            !skill.isForDead() && targets->getAttribute("health") > 0) {
+            msg += std::to_string(i++) + "." + targets->name + " ";
         }
     }
     msg += "0.返回";

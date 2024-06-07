@@ -1,4 +1,5 @@
 // main.cpp
+#include "Map.h"
 #include "Battle.h"
 #include "GameInitialization.h"
 
@@ -7,7 +8,6 @@ int main() {
     initscr();
     noecho();
     cbreak();
-
 
     // 获取屏幕尺寸
     int max_y, max_x;
@@ -26,11 +26,15 @@ int main() {
     GameWindow logWin(middle_height, max_x, top_height, 0);
     GameWindow commandWin(bottom_height, max_x, top_height + middle_height, 0);
 
-    Battle battle(&logWin, &alliesWin, &enemiesWin, &commandWin);
-    battle.runBattle();
 
-    wgetch(logWin.win);  // Wait for user input to view log window
-    GameInitialization::cleanup();
-    endwin();
+    Map map(&logWin, &alliesWin, &enemiesWin, &commandWin);
+    map.runMap();
+
+//    Battle battle(&logWin, &alliesWin, &enemiesWin, &commandWin);
+//    battle.runBattle();
+//
+//    wgetch(logWin.win);  // Wait for user input to view log window
+//    GameInitialization::cleanup();
+//    endwin();
     return 0;
 }

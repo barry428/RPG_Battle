@@ -1,3 +1,5 @@
+#pragma once
+
 // GameWindow.h
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H

@@ -52,8 +52,6 @@ public:
 
     void printTargetChoices(const Skill &skill, const std::vector<Character *> &targets);
 
-    void executeSkillChoice(Character &caster, Character &target, Skill &skill);
-
     void selectTargetsAndExecuteSkill(Character &actor, Skill &skill);
 
     void executeSkillChoice(Character &caster, std::vector<Character *> &targets, Skill &skill);

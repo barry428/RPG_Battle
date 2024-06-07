@@ -1,22 +1,15 @@
 // Skill.h
+#pragma once
 #ifndef SKILL_H
 #define SKILL_H
 
 #include <string>
 #include <functional>
 #include "Character.h"
+#include "SkillType.h"
+#include "SkillTarget.h"
 
 class Character;
-
-enum class SkillTarget {
-    Enemy,     // 敌方
-    Ally       // 友方
-};
-
-enum class SkillType {
-    Single,    // 单体
-    Area       // 群体
-};
 
 class Skill {
 public:
@@ -44,6 +37,10 @@ public:
 
 
     //群体技能
+    Skill(std::string n, int cost, SkillType tp,
+          std::function<void(Character &caster, std::vector<Character *> &targets)> eff)
+            : name(n), manaCost(cost), type(tp), areaEffect(eff) {}
+
     Skill(std::string n, int cost, SkillType tp, SkillTarget trgt,
           std::function<void(Character &caster, std::vector<Character *> &targets)> eff)
             : name(n), manaCost(cost), type(tp), target(trgt), areaEffect(eff) {}
