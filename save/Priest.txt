@@ -1,0 +1,12 @@
+type:Priest
+name:牧师+2
+desc:牧师是一个支援角色，擅长治疗和恢复，同时具有弱化敌人的能力。
+level:13
+experience:7300
+attributes.attack:10
+attributes.defense:10
+attributes.health:365
+attributes.mana:760
+attributes.maxHealth:380
+attributes.maxMana:760
+attributes.speed:10

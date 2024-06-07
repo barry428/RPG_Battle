@@ -1,0 +1,12 @@
+type:Mage
+name:法师+1
+desc:法师是一个擅长远程攻击和施放强大法术的角色，能够造成大量的魔法伤害，但身体较为脆弱。
+level:4
+experience:300
+attributes.attack:10
+attributes.defense:10
+attributes.health:100
+attributes.mana:150
+attributes.maxHealth:160
+attributes.maxMana:320
+attributes.speed:10

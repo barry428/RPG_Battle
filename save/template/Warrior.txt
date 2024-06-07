@@ -1,0 +1,12 @@
+type:Warrior
+name:战士+1
+desc:战士是前线的坚固防御者，具有高生命值和防御力，擅长近战攻击。
+level:4
+experience:300
+attributes.attack:10
+attributes.defense:10
+attributes.health:200
+attributes.mana:50
+attributes.maxHealth:320
+attributes.maxMana:110
+attributes.speed:10
