@@ -1,6 +1,4 @@
-// Battle.h
-#ifndef Map_H
-#define Map_H
+#pragma once
 
 #include "GameWindow.h"
 #include "Character.h"
@@ -46,5 +44,3 @@ public:
 
 
 };
-
-#endif

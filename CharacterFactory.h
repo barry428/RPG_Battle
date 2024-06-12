@@ -1,7 +1,10 @@
+#pragma once
+
 #include <string>
 #include <memory>
 #include <fstream>
 #include <sstream>
+
 #include "Character.h"
 
 class CharacterFactory {

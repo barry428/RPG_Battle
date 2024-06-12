@@ -1,6 +1,4 @@
-// Battle.h
-#ifndef BATTLE_H
-#define BATTLE_H
+#pragma once
 
 #include "GameWindow.h"
 #include "Skill.h"  // 首先包含 Skill
@@ -24,9 +22,9 @@ public:
 
     void initializeCharacters();
 
-    std::vector<std::string> alliesInfo();
+    static std::vector<std::string> alliesInfo();
 
-    std::vector<std::string> enemiesInfo();
+    static std::vector<std::string> enemiesInfo();
 
     void runBattle();
 
@@ -57,4 +55,3 @@ public:
     void executeSkillChoice(Character &caster, std::vector<Character *> &targets, Skill &skill);
 };
 
-#endif

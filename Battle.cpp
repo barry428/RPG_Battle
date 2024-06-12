@@ -53,7 +53,6 @@ int Battle::checkBattleRes() {
     }
 
     if (eStatus == false) {
-
         // 给与所有角色经验奖励
         int experience = 0;
         for (auto &enemy: enemies) {
@@ -65,7 +64,6 @@ int Battle::checkBattleRes() {
             allie->gainExperience(experience);
             allie->saveToFile();
         }
-
         return -2;
     }
 

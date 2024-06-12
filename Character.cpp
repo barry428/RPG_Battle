@@ -14,7 +14,7 @@ void Character::receiveDamage(int damage) {
 }
 
 int Character::attackTarget(Character &target) {
-    int damage = getAttribute("attack"); - target.getAttribute("defense");
+    int damage = getAttribute("attack") - target.getAttribute("defense");
     damage = damage > 0 ? damage : 0;
     target.receiveDamage(damage);
     return damage;

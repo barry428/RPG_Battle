@@ -11,12 +11,12 @@ int Map::npcIndex = 0;
 
 Map::Map(GameWindow *lw, GameWindow *aw, GameWindow *ew, GameWindow *cw)
         : logWin(lw), alliesWin(aw), enemiesWin(ew), commandWin(cw) {
+
+    // 初始化玩家角色
     initializeCharacters();
 
     // 初始化地图数据
     MapGenerator::generateMapData();
-
-    Map::loc = "";
 }
 
 void Map::initializeCharacters() {
@@ -143,8 +143,7 @@ void Map::showNpc(int subMapId) {
 
 void Map::showAction(int npcId) {
     logEntries.clear();
-    logWin->printLog(logEntries, "选择和" +
-                                 MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name +
+    logWin->printLog(logEntries, "选择和" + MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name +
                                  "：");
     logWin->printLog(logEntries, "1. 说话");
     logWin->printLog(logEntries, "2. 攻击");
@@ -177,7 +176,7 @@ void Map::talk(int npcId) {
 void Map::attack(int npcId) {
     logEntries.clear();
     std::string name = MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name;
-    logWin->printLog(logEntries, "和" + name + "战斗");
+    logWin->printLog(logEntries, "和" + name + "战斗？1.开始战斗 0.返回");
 
     char input = wgetch(commandWin->win);
     Map::index = input - '0';
@@ -188,6 +187,6 @@ void Map::attack(int npcId) {
         GameInitialization::initEnemies();
         Battle battle(this->logWin, this->alliesWin, this->enemiesWin, this->commandWin);
         battle.runBattle();
-        Map::loc = "attack";
+        Map::loc = "action";
     }
 }

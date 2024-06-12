@@ -1,9 +1,5 @@
 #pragma once
 
-// GameWindow.h
-#ifndef GAMEWINDOW_H
-#define GAMEWINDOW_H
-
 #include <ncurses.h>
 #include <deque>
 #include <string>
@@ -23,5 +19,3 @@ public:
     void clearWindow();
     void refreshWindow();
 };
-
-#endif

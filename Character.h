@@ -1,18 +1,16 @@
-// Character.h
-#ifndef CHARACTER_H
-#define CHARACTER_H
+#pragma once
 
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
 #include <cxxabi.h>
-#include "Skill.h"
-#include "SkillType.h"
-#include "SkillTarget.h"
+#include "SkillsManager.h"
 #include "Equipment.h"
 
 class Skill;
+
+class SkillsManager;
 
 class Equipment;
 
@@ -102,43 +100,14 @@ public:
     using Allies::Allies;
 
     void increaseStats() override {
-        switch (level / 10) {
-            case 0:
-                attributes["maxHealth"] += 40;
-                attributes["maxMana"] += 20;
-                name = "战士+1";
-                break;
-            case 1:
-                attributes["maxHealth"] += 60;
-                attributes["maxMana"] += 30;
-                name = "战士+2";
-                break;
-            case 2:
-                attributes["maxHealth"] += 80;
-                attributes["maxMana"] += 40;
-                name = "战士+3";
-                break;
-            case 3:
-                attributes["maxHealth"] += 100;
-                attributes["maxMana"] += 50;
-                name = "战士+4";
-                break;
-        }
+        std::string name = "战士+" + std::to_string(level / 10 + 1);
+        attributes["maxHealth"] += (level / 10) * 20 + 40;
+        attributes["maxMana"] += (level / 10) * 10 + 40;
         attributes["health"] = attributes["maxHealth"];
         attributes["mana"] = attributes["maxMana"];
     }
 
     void unlockSkills() override {
-        skills.push_back(std::make_shared<Skill>("嘲讽+1", 15, [](Character &caster, Character &target) {
-            caster.attributes["mana"] -= 15;
-            // 持续时间 2个回合
-        }));
-
-        skills.push_back(std::make_shared<Skill>("坚守+1", 15, [](Character &caster, Character &target) {
-            caster.attributes["mana"] -= 15;
-            caster.attributes["defense"] += 15;
-            // 持续时间 2个回合
-        }));
 
     }
 
@@ -153,49 +122,15 @@ public:
     using Allies::Allies;
 
     void increaseStats() override {
-        switch (level / 10) {
-            case 0:
-                attributes["maxHealth"] += 20;
-                attributes["maxMana"] += 40;
-                name = "法师+1";
-                break;
-            case 1:
-                attributes["maxHealth"] += 30;
-                attributes["maxMana"] += 60;
-                name = "法师+2";
-                break;
-            case 2:
-                attributes["maxHealth"] += 40;
-                attributes["maxMana"] += 80;
-                name = "法师+3";
-                break;
-            case 3:
-                attributes["maxHealth"] += 50;
-                attributes["maxMana"] += 100;
-                name = "法师+4";
-                break;
-        }
+        std::string name = "法师+" + std::to_string(level / 10 + 1);
+        attributes["maxHealth"] += (level / 10) * 10 + 40;
+        attributes["maxMana"] += (level / 10) * 20 + 40;
         attributes["health"] = attributes["maxHealth"];
         attributes["mana"] = attributes["maxMana"];
     }
 
     void unlockSkills() override {
-        skills.push_back(std::make_shared<Skill>("火球术+1", 25, [](Character &caster, Character &target) {
-            int damage = 50;  // 例如火球技能的固定伤害
-            target.receiveDamage(damage);
-            caster.attributes["mana"] -= 25;
-        }));
 
-        skills.push_back(std::make_shared<Skill>("火焰风暴+1", 50, SkillType::Area,
-                                                 [](Character &caster, std::vector<Character *> &targets) {
-                                                     for (Character *target: targets) {
-                                                         if (target->attributes["health"] > 0) {
-                                                             int damage = 200; // 每个目标固定受到20点伤害
-                                                             target->receiveDamage(damage);
-                                                         }
-                                                     }
-                                                     caster.attributes["mana"] -= 50;
-                                                 }));
     }
 
     Character *clone() const override {
@@ -209,57 +144,15 @@ public:
     using Allies::Allies;
 
     void increaseStats() override {
-        switch (level / 10) {
-            case 0:
-                attributes["maxHealth"] += 20;
-                attributes["maxMana"] += 40;
-                name = "牧师+1";
-                break;
-            case 1:
-                attributes["maxHealth"] += 30;
-                attributes["maxMana"] += 60;
-                name = "牧师+2";
-                break;
-            case 2:
-                attributes["maxHealth"] += 40;
-                attributes["maxMana"] += 80;
-                name = "牧师+3";
-                break;
-            case 3:
-                attributes["maxHealth"] += 50;
-                attributes["maxMana"] += 100;
-                name = "牧师+4";
-                break;
-        }
+        std::string name = "牧师+" + std::to_string(level / 10 + 1);
+        attributes["maxHealth"] += (level / 10) * 10 + 40;
+        attributes["maxMana"] += (level / 10) * 20 + 40;
         attributes["health"] = attributes["maxHealth"];
         attributes["mana"] = attributes["maxMana"];
     }
 
     void unlockSkills() override {
-        skills.push_back(std::make_shared<Skill>("治疗术+1", 20, SkillTarget::Ally,
-                                                 [](Character &caster, Character &target) {
-                                                     int healing = 50;
-                                                     target.attributes["health"] += healing;
-                                                     if (target.attributes["health"] >
-                                                         target.attributes["maxHealth"])
-                                                         target.attributes["health"] = target.attributes["maxHealth"];
-                                                     caster.attributes["mana"] -= 25;
-                                                 }));
 
-        skills.push_back(std::make_shared<Skill>("治疗波+1", 30, SkillType::Area, SkillTarget::Ally,
-                                                 [](Character &caster, std::vector<Character *> &targets) {
-                                                     for (Character *target: targets) {
-                                                         if (target->attributes["health"] > 0) {
-                                                             int healing = 20; // 每个目标恢复25点生命值
-                                                             target->attributes["health"] += healing;
-                                                             if (target->attributes["health"] >
-                                                                 target->attributes["maxHealth"]) {
-                                                                 target->attributes["health"] = target->attributes["maxHealth"]; // 生命值不能超过最大生命值
-                                                             }
-                                                         }
-                                                     }
-                                                     caster.attributes["mana"] -= 30;
-                                                 }));
     }
 
     Character *clone() const override {
@@ -307,4 +200,3 @@ public:
     }
 };
 
-#endif

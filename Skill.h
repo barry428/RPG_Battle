@@ -1,7 +1,5 @@
 // Skill.h
 #pragma once
-#ifndef SKILL_H
-#define SKILL_H
 
 #include <string>
 #include <functional>
@@ -35,12 +33,12 @@ public:
           std::function<void(Character &caster, Character &target)> eff)
             : name(n), manaCost(cost), target(trgt), forDead(forDead), effect(eff) {}
 
-
     //群体技能
     Skill(std::string n, int cost, SkillType tp,
           std::function<void(Character &caster, std::vector<Character *> &targets)> eff)
             : name(n), manaCost(cost), type(tp), areaEffect(eff) {}
 
+    //可以对我方释放的群体技能
     Skill(std::string n, int cost, SkillType tp, SkillTarget trgt,
           std::function<void(Character &caster, std::vector<Character *> &targets)> eff)
             : name(n), manaCost(cost), type(tp), target(trgt), areaEffect(eff) {}
@@ -59,4 +57,3 @@ public:
 
 };
 
-#endif
