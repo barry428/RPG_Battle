@@ -1,19 +1,32 @@
+
+#include <random>
+#include <vector>
+
 // 在游戏或特定场景初始化中
 #include "GameInitialization.h"
 #include "SkillsManager.h"
 #include "Character.h"
 #include "CharacterFactory.h"
-#include <random>
+#include "Equipment.h"
 
 std::vector<Character *> GameInitialization::characters;
 std::vector<Character *> GameInitialization::enemies;
 
+std::map<EquipmentType, Equipment *> GameInitialization::warriorSet;
+std::map<EquipmentType, Equipment *> GameInitialization::mageSet;
+std::map<EquipmentType, Equipment *> GameInitialization::priestSet;
+
 void GameInitialization::initializeCharacters() {
     SkillsManager::initializeSkills();
+    initEquipment();
 
     // 将角色添加到全局角色列表中
     Character *warrior = CharacterFactory::loadFromFile("save/Warrior.txt");
     SkillsManager::initializeCharacterSkills(warrior, "warrior");
+    warrior->equipment[EquipmentType::Helmet] = GameInitialization::warriorSet[EquipmentType::Helmet];
+    warrior->equipment[EquipmentType::Armor] = GameInitialization::warriorSet[EquipmentType::Armor];
+    warrior->equipment[EquipmentType::Weapon] = GameInitialization::warriorSet[EquipmentType::Weapon];
+    warrior->equipment[EquipmentType::Shield] = GameInitialization::warriorSet[EquipmentType::Shield];
     GameInitialization::characters.push_back(warrior);
 
     Character *mage = CharacterFactory::loadFromFile("save/Mage.txt");
@@ -27,6 +40,29 @@ void GameInitialization::initializeCharacters() {
     // 定义敌方角色原型
     GameInitialization::initEnemies();
 }
+
+
+// 使用这些装备创建角色或配置角色
+void GameInitialization::initEquipment() {
+    // 创建战士装备
+    GameInitialization::warriorSet[EquipmentType::Helmet] = new Equipment("Warrior Helmet", EquipmentType::Helmet, {{"defense", 20}});
+    GameInitialization::warriorSet[EquipmentType::Armor] = new Equipment("Warrior Armor", EquipmentType::Armor, {{"defense", 50}});
+    GameInitialization::warriorSet[EquipmentType::Weapon] = new Equipment("Warrior Sword", EquipmentType::Weapon, {{"attack", 30}});
+    GameInitialization::warriorSet[EquipmentType::Shield] = new Equipment("Warrior Shield", EquipmentType::Shield, {{"defense", 40}});
+
+    // 创建法师装备
+//    Equipment mageHelmet("Mage Helmet", EquipmentType::Helmet, {{"mana", 50}, {"health", 10}});
+//    Equipment mageArmor("Mage Robe", EquipmentType::Armor, {{"mana", 40}, {"magic_defense", 30}});
+//    Equipment mageWeapon("Mage Staff", EquipmentType::Weapon, {{"magic_attack", 35}, {"mana", 20}});
+//
+//    // 创建牧师装备
+//    Equipment priestHelmet("Priest Mitre", EquipmentType::Helmet, {{"mana", 40}, {"spirit", 10}});
+//    Equipment priestArmor("Priest Robe", EquipmentType::Armor, {{"health_regen", 20}, {"magic_defense", 20}});
+//    Equipment priestWeapon("Priest Staff", EquipmentType::Weapon, {{"healing_power", 30}, {"mana", 25}});
+
+}
+
+
 
 // 随机生成敌人
 void GameInitialization::initEnemies() {

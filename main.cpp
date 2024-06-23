@@ -1,5 +1,6 @@
 // main.cpp
 #include "Map.h"
+#include "Menu.h"
 #include "Battle.h"
 #include "GameInitialization.h"
 
@@ -13,10 +14,13 @@ int main() {
     int max_y, max_x;
     getmaxyx(stdscr, max_y, max_x);
 
+    max_y = max_y > 40 ? 40 : max_y;
+    max_x = max_x > 80 ? 80 : max_x;
+
     // 计算窗口尺寸
-    int top_height = max_y / 4;  // 上部窗口的高度
+    int bottom_height = 4;  // 底部命令窗口的高度
+    int top_height = 8;  // 上部窗口的高度
     int middle_height = max_y / 2;  // 中间日志窗口的高度
-    int bottom_height = max_y - top_height - middle_height;  // 底部命令窗口的高度
     int half_width = max_x / 2;  // 上部窗口的一半宽度
 
     GameInitialization::initializeCharacters();
@@ -26,15 +30,13 @@ int main() {
     GameWindow logWin(middle_height, max_x, top_height, 0);
     GameWindow commandWin(bottom_height, max_x, top_height + middle_height, 0);
 
+    Menu menu(&logWin, &alliesWin, &enemiesWin, &commandWin);
 
-    Map map(&logWin, &alliesWin, &enemiesWin, &commandWin);
-    map.runMap();
-
+//    Map map(&logWin, &alliesWin, &enemiesWin, &commandWin);
+//    map.runMap();
 //    Battle battle(&logWin, &alliesWin, &enemiesWin, &commandWin);
 //    battle.runBattle();
 //
-//    wgetch(logWin.win);  // Wait for user input to view log window
-//    GameInitialization::cleanup();
 //    endwin();
     return 0;
 }

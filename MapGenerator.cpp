@@ -8,7 +8,7 @@ void MapGenerator::generateMapData() {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(3, 5);  // 用于生成小区域和NPC的数量
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 5; ++i) {
         Region region;
         region.id = regionId++;
         region.name = "Region " + std::to_string(region.id);

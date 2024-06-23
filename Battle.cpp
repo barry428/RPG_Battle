@@ -93,6 +93,9 @@ void Battle::runBattle() {
         executeTurn();
     }
 
+    commandWin->displayCommand("战斗结束，请选择：0. 返回");
+    wgetch(commandWin->win);
+
     alliesWin->updateStatus(alliesInfo());
     enemiesWin->updateStatus(enemiesInfo());
 }

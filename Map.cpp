@@ -49,7 +49,7 @@ void Map::runMap() {
         alliesWin->updateStatus(alliesInfo());
 
         // 命令菜单
-        commandWin->displayCommand("选择要去的地方: 1, 2, 3, 0.返回上级菜单");
+        commandWin->displayCommand("你的选择是: ");
 
         if (Map::loc == "mainMap") {        // 当前进入大区域了，就展示小区域
             enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name});
@@ -92,8 +92,10 @@ void Map::runMap() {
 void Map::mainMap() {
     logEntries.clear();
     logWin->printLog(logEntries, "接下来打算去哪里：");
+    int i = 1;
     for (auto &[id, region]: MapGenerator::regions) {
-        logWin->printLog(logEntries, "Region ID: " + std::to_string(id) + ", Name: " + region.name);
+        logWin->printLog(logEntries, std::to_string(i) + ". Region ID: " + std::to_string(id) + ", Name: " + region.name);
+        i++;
     }
 
     char input = wgetch(commandWin->win);
@@ -104,21 +106,23 @@ void Map::mainMap() {
     } else {
         Map::loc = "world";
     }
-
 }
 
 void Map::subMap(int mainMapId) {
     logEntries.clear();
     logWin->printLog(logEntries, "接下来打算去哪里：");
+    int i = 1;
     for (auto &location: MapGenerator::regions[Map::mainMapIndex].locations) {
-        logWin->printLog(logEntries, "Location ID: " + std::to_string(location.id) + ", Name: " + location.name);
+        logWin->printLog(logEntries, std::to_string(i) + ". Location ID: " + std::to_string(location.id) + ", Name: " + location.name);
+        i++;
     }
+    logWin->printLog(logEntries, "0. 返回");
 
     char input = wgetch(commandWin->win);
     Map::index = input - '0';
     if (index > 0) {
         Map::loc = "subMap";
-        Map::subMapIndex = Map::index;
+        Map::subMapIndex = Map::index - 1;
     } else {
         Map::loc = "world";
     }
@@ -128,14 +132,18 @@ void Map::subMap(int mainMapId) {
 void Map::showNpc(int subMapId) {
     logEntries.clear();
     logWin->printLog(logEntries, "选择npc：");
+    int i = 1;
     for (auto &npc: MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs) {
-        logWin->printLog(logEntries, "NPC ID: " + std::to_string(npc.id) + ", Name: " + npc.name);
+        logWin->printLog(logEntries, std::to_string(i) + ". NPC ID: " + std::to_string(npc.id) + ", Name: " + npc.name);
+        i++;
     }
+    logWin->printLog(logEntries, "0. 返回");
 
     char input = wgetch(commandWin->win);
     Map::index = input - '0';
     if (index > 0) {
         Map::loc = "npc";
+        Map::npcIndex = Map::index - 1;
     } else {
         Map::loc = "mainMap";
     }
@@ -147,6 +155,7 @@ void Map::showAction(int npcId) {
                                  "：");
     logWin->printLog(logEntries, "1. 说话");
     logWin->printLog(logEntries, "2. 攻击");
+    logWin->printLog(logEntries, "0. 返回");
 
     char input = wgetch(commandWin->win);
     Map::index = input - '0';
@@ -163,6 +172,7 @@ void Map::talk(int npcId) {
     logEntries.clear();
     std::string name = MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name;
     logWin->printLog(logEntries, "和" + name + "聊天");
+    logWin->printLog(logEntries, "0. 返回");
 
     char input = wgetch(commandWin->win);
     Map::index = input - '0';
@@ -176,7 +186,9 @@ void Map::talk(int npcId) {
 void Map::attack(int npcId) {
     logEntries.clear();
     std::string name = MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name;
-    logWin->printLog(logEntries, "和" + name + "战斗？1.开始战斗 0.返回");
+    logWin->printLog(logEntries, "和" + name + "进行战斗？");
+    logWin->printLog(logEntries, "1. 确认");
+    logWin->printLog(logEntries, "0. 取消");
 
     char input = wgetch(commandWin->win);
     Map::index = input - '0';

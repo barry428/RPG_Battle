@@ -7,6 +7,8 @@ set(CMAKE_OSX_ARCHITECTURES "arm64")
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
 
-add_executable(ncurses main.cpp battle.cpp GameWindow.cpp Character.cpp Skill.cpp GameInitialization.cpp CharacterFactory.h SkillsManager.cpp Map.cpp Map.cpp MapGenerator.cpp)
+add_executable(ncurses main.cpp battle.cpp GameWindow.cpp Character.cpp Skill.cpp GameInitialization.cpp CharacterFactory.h SkillsManager.cpp Map.cpp Map.cpp MapGenerator.cpp Menu.cpp Equipment.cpp Table.cpp)
 target_link_libraries(ncurses ${CURSES_LIBRARIES})
+
+
 
