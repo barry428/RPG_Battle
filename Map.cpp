@@ -41,7 +41,7 @@ std::vector<std::string> Map::alliesInfo() {
 void Map::runMap() {
 
     // 当前所在地图简介
-    enemiesWin->updateStatus({"World"});
+    enemiesWin->updateStatus({"大地图"});
 
     // 处理主窗口
     while (true) {
@@ -52,34 +52,40 @@ void Map::runMap() {
         commandWin->displayCommand("你的选择是: ");
 
         if (Map::loc == "mainMap") {        // 当前进入大区域了，就展示小区域
-            enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name});
+            enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name,
+                                      MapGenerator::regions[Map::mainMapIndex].description});
             subMap(Map::index);
         } else if (Map::loc == "subMap") {  // 当前在小区域了就展示npc
             enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name,
-                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].name});
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].name,
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].description});
             showNpc(Map::index);
         } else if (Map::loc == "npc") {     // 当前在npc就是展示动作
             enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name,
                                       MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].name,
-                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name});
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name,
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].description});
             showAction(Map::index);
         } else if (Map::loc == "action") {
             enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name,
                                       MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].name,
-                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name});
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name,
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].description});
             showAction(Map::index);
         } else if (Map::loc == "talk") {
             enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name,
                                       MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].name,
-                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name});
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name,
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].description});
             Map::talk(Map::index);
         } else if (Map::loc == "attack") {
             enemiesWin->updateStatus({MapGenerator::regions[Map::mainMapIndex].name,
                                       MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].name,
-                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name});
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name,
+                                      MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].description});
             Map::attack(Map::index);
         } else {
-            enemiesWin->updateStatus({"World"});
+            enemiesWin->updateStatus({"大地图"});
             mainMap();
         }
     }
@@ -94,7 +100,7 @@ void Map::mainMap() {
     logWin->printLog(logEntries, "接下来打算去哪里：");
     int i = 1;
     for (auto &[id, region]: MapGenerator::regions) {
-        logWin->printLog(logEntries, std::to_string(i) + ". Region ID: " + std::to_string(id) + ", Name: " + region.name);
+        logWin->printLog(logEntries, std::to_string(id) + ". " + region.name + "-" + region.description);
         i++;
     }
 
@@ -113,7 +119,7 @@ void Map::subMap(int mainMapId) {
     logWin->printLog(logEntries, "接下来打算去哪里：");
     int i = 1;
     for (auto &location: MapGenerator::regions[Map::mainMapIndex].locations) {
-        logWin->printLog(logEntries, std::to_string(i) + ". Location ID: " + std::to_string(location.id) + ", Name: " + location.name);
+        logWin->printLog(logEntries, std::to_string(location.id) + ". " + location.name + "-" + location.description);
         i++;
     }
     logWin->printLog(logEntries, "0. 返回");
@@ -134,7 +140,7 @@ void Map::showNpc(int subMapId) {
     logWin->printLog(logEntries, "选择npc：");
     int i = 1;
     for (auto &npc: MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs) {
-        logWin->printLog(logEntries, std::to_string(i) + ". NPC ID: " + std::to_string(npc.id) + ", Name: " + npc.name);
+        logWin->printLog(logEntries, std::to_string(npc.id) + ". " + npc.name);
         i++;
     }
     logWin->printLog(logEntries, "0. 返回");
@@ -171,7 +177,7 @@ void Map::showAction(int npcId) {
 void Map::talk(int npcId) {
     logEntries.clear();
     std::string name = MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name;
-    logWin->printLog(logEntries, "和" + name + "聊天");
+    logWin->printLog(logEntries, "你正在和" + name + "聊天");
     logWin->printLog(logEntries, "0. 返回");
 
     char input = wgetch(commandWin->win);
@@ -186,7 +192,7 @@ void Map::talk(int npcId) {
 void Map::attack(int npcId) {
     logEntries.clear();
     std::string name = MapGenerator::regions[Map::mainMapIndex].locations[Map::subMapIndex].npcs[Map::npcIndex].name;
-    logWin->printLog(logEntries, "和" + name + "进行战斗？");
+    logWin->printLog(logEntries, "你要和" + name + "进行战斗？");
     logWin->printLog(logEntries, "1. 确认");
     logWin->printLog(logEntries, "0. 取消");
 

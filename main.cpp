@@ -15,7 +15,7 @@ int main() {
     getmaxyx(stdscr, max_y, max_x);
 
     max_y = max_y > 40 ? 40 : max_y;
-    max_x = max_x > 80 ? 80 : max_x;
+    max_x = max_x > 120 ? 120 : max_x;
 
     // 计算窗口尺寸
     int bottom_height = 4;  // 底部命令窗口的高度
